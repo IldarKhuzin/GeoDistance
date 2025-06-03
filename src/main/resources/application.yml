@@ -1,0 +1,41 @@
+server:
+  port: 8081
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoint:
+    prometheus:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    ru.ildar.distcalc: INFO
+
+app:
+  yandex:
+    api-key: YOUR_YANDEX_API_KEY
+    url: https://geocode-maps.yandex.ru/1.x/
+  dadata:
+    token: YOUR_DADATA_TOKEN
+    url: https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address
+
+webclient:
+  connect-timeout-ms: 5000
+  read-timeout-ms: 10000
