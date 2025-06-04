@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Копируем собранный .jar файл в контейнер
-COPY target/distcalc-service-*.jar app.jar
+COPY target/geodistance-*.jar app.jar
 
 # Указываем порт, который будет использоваться внутри контейнера
 EXPOSE 8081

@@ -40,7 +40,6 @@ GeoDistance-service/
 │   │   ├── java/ru/ildar/geodistance/
 │   │   │   ├── config/
 │   │   │   │   ├── WebClientConfig.java
-│   │   │   │   ├── PrometheusConfig.java
 │   │   │   │   └── AppProperties.java
 │   │   │   ├── controller/
 │   │   │   │   └── GeoDistanceController.java
@@ -75,8 +74,8 @@ GeoDistance-service/
 │   │   └── dashboards/
 │   │       ├── spring-boot.json
 │   │       └── jvm-metrics.json
-│   ├── Dockerfile
 │   └── docker-compose.yml
+|── Dockerfile
 ├── .gitignore
 ├── pom.xml
 └── README.md
