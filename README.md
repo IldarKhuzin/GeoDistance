@@ -35,16 +35,25 @@ GeoDistance — это Spring Boot приложение для сравнени�
 📦 Структура проекта
 
 GeoDistance-service/
+
 ├── src/
 
 │   ├── main/
+
 │   │   ├── java/ru/ildar/geodistance/
+
 │   │   │   ├── config/
+
 │   │   │   │   ├── WebClientConfig.java
+
 │   │   │   │   ├── PrometheusConfig.java
+
 │   │   │   │   └── AppProperties.java
+
 │   │   │   ├── controller/
+
 │   │   │   │   └── GeoDistanceController.java
+
 │   │   │   ├── dto/
 │   │   │   │   ├── AddressRequest.java
 │   │   │   │   ├── GeoResponse.java
