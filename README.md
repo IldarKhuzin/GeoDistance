@@ -1,4 +1,4 @@
-📍 DistCalc
+📍 GeoDistance
 
 GeoDistance — это Spring Boot приложение для сравнения координат,
 полученных от двух геокодеров (Yandex и Dadata), с вычислением расстояния между ними и сохранением
@@ -35,50 +35,98 @@ GeoDistance — это Spring Boot приложение для сравнени�
 📦 Структура проекта
 
 GeoDistance-service/
+
 ├── src/
+
 │   ├── main/
+
 │   │   ├── java/ru/ildar/geodistance/
+
 │   │   │   ├── config/
+
 │   │   │   │   ├── WebClientConfig.java
+
+│   │   │   │   ├── PrometheusConfig.java
+
 │   │   │   │   └── AppProperties.java
+
 │   │   │   ├── controller/
+
 │   │   │   │   └── GeoDistanceController.java
+
 │   │   │   ├── dto/
+
 │   │   │   │   ├── AddressRequest.java
+
 │   │   │   │   ├── GeoResponse.java
+
 │   │   │   │   └── ApiErrorResponse.java
+
 │   │   │   ├── exception/
+
 │   │   │   │   ├── GlobalExceptionHandler.java
+
 │   │   │   │   ├── GeoServiceException.java
+
 │   │   │   │   └── ResourceNotFoundException.java
+
 │   │   │   ├── model/
+
 │   │   │   │   └── AddressEntity.java
+
 │   │   │   ├── repository/
+
 │   │   │   │   └── AddressRepository.java
+
 │   │   │   ├── service/
+
 │   │   │   │   ├── GeoDistanceService.java
+
 │   │   │   │   ├── YandexGeoService.java
+
 │   │   │   │   ├── DadataGeoService.java
+
 │   │   │   │   └── DistanceCalculator.java
+
 │   │   │   └── GeoDistanceApplication.java
+
 │   │   └── resources/
+
 │   │       ├── application.yml
+
 │   │       ├── application-dev.yml
+
 │   │       └── application-prod.yml
+
 │   └── test/
+
 │       └── java/ru/ildar/geodistance/
+
 ├── docker/
+
 │   ├── prometheus/
+
 │   │   └── prometheus.yml
+
 │   ├── grafana/
+
 │   │   └── dashboards/
+
 │   │       ├── spring-boot.json
+
 │   │       └── jvm-metrics.json
+
+│   ├── Dockerfile
+
 │   └── docker-compose.yml
+
 |── Dockerfile
 ├── .gitignore
+
 ├── pom.xml
+
 └── README.md
+
 
 ------------------------------------------------------------
 
