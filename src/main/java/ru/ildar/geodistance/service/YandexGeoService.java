@@ -1,5 +1,6 @@
 package ru.ildar.geodistance.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.ildar.geodistance.exception.GeoServiceException;
@@ -12,7 +13,7 @@ public class YandexGeoService {
 
     private final WebClient webClient;
 
-    public YandexGeoService(WebClient webClient) {
+    public YandexGeoService(@Qualifier("yandexWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
 
