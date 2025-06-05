@@ -2,6 +2,17 @@ server:
   port: 8081
 
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/${MYSQL_DB}?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true&autoReconnect=true
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    hikari:
+      connection-timeout: 60000
+      initialization-fail-timeout: 60000
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -9,24 +20,20 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  profiles:
-    active: dev
-
+        dialect: org.hibernate.dialect.MySQL8Dialect
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,prometheus
-
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-
   endpoint:
     prometheus:
       enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 logging:
   level:
@@ -35,11 +42,11 @@ logging:
 
 app:
   yandex:
-    api-key: YOUR_YANDEX_API_KEY
+    api-key: ${YANDEX_API_KEY}
     url: https://geocode-maps.yandex.ru/1.x/
   dadata:
-    api-key: some-placeholder-key
-    token: YOUR_DADATA_TOKEN
+    api-key: ${DADATA_API_KEY}
+    token: ${DADATA_TOKEN}
     url: https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address
 
 webclient:

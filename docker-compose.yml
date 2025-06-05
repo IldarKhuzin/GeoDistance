@@ -6,44 +6,56 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"  # наружу и внутрь 8081
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      - "8081:8081"
+    env_file:
+      - .env
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    entrypoint: ["sh", "-c", "until nc -z mysql 3306; do echo waiting for mysql; sleep 2; done; java -jar /app/app.jar"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - backend
 
   mysql:
     image: mysql:8
-    container_name: mysql
     environment:
-      MYSQL_DATABASE: distcalc
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u admin -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+    restart: always
 
   prometheus:
     image: prom/prometheus
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
+      - "9091:9090"
     networks:
       - backend
 
   grafana:
     image: grafana/grafana
     volumes:
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
     ports:
-      - "3000:3000"
+      - "3001:3000"
     networks:
       - backend
 

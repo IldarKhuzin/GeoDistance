@@ -1,14 +1,12 @@
-# Используем официальный образ OpenJDK
 FROM openjdk:17-jdk-slim
 
-# Указываем рабочую директорию в контейнере
 WORKDIR /app
 
-# Копируем собранный .jar файл в контейнер
+# Установка netcat
+RUN apt-get update && apt-get install -y netcat && rm -rf /var/lib/apt/lists/*
+
 COPY target/geodistance-*.jar app.jar
 
-# Указываем порт, который будет использоваться внутри контейнера
 EXPOSE 8081
 
-# Команда запуска приложения
 ENTRYPOINT ["java", "-jar", "app.jar"]
