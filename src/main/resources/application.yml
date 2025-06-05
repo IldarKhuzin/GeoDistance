@@ -19,14 +19,13 @@ management:
       exposure:
         include: health,info,prometheus
 
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-
   endpoint:
     prometheus:
       enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 logging:
   level:
@@ -35,11 +34,11 @@ logging:
 
 app:
   yandex:
-    api-key: YOUR_YANDEX_API_KEY
+    api-key: a95f5d4d-151b-42d9-8519-7aef29a5a5c1
     url: https://geocode-maps.yandex.ru/1.x/
   dadata:
-    api-key: some-placeholder-key
-    token: YOUR_DADATA_TOKEN
+    api-key: 3ae49eb03d50473ad14419fe4dbd953a99dff432
+    token: 3ae49eb03d50473ad14419fe4dbd953a99dff432
     url: https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address
 
 webclient:

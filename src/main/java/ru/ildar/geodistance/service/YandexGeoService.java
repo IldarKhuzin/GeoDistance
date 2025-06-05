@@ -1,6 +1,7 @@
 package ru.ildar.geodistance.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.ildar.geodistance.exception.GeoServiceException;
@@ -13,17 +14,19 @@ public class YandexGeoService {
 
     private final WebClient webClient;
 
+    @Value("${app.yandex.api-key}")
+    private String apiKey;
+
     public YandexGeoService(@Qualifier("yandexWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
 
     public Coordinates getCoordinates(String address) {
         try {
-            // Запрос к Yandex Maps API, ожидается ответ в виде Map
             Map<String, Object> responseMap = webClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/geocode")
-                            .queryParam("apikey", "YOUR_API_KEY")
+                            .queryParam("apikey", apiKey)
                             .queryParam("format", "json")
                             .queryParam("geocode", address)
                             .build())
@@ -35,7 +38,6 @@ public class YandexGeoService {
                 throw new GeoServiceException("Empty response from Yandex API");
             }
 
-            // Разбор ответа
             Map<String, Object> response = castToMap(responseMap.get("response"));
             Map<String, Object> geoObjectCollection = castToMap(response.get("GeoObjectCollection"));
             List<Map<String, Object>> featureMember = castToList(geoObjectCollection.get("featureMember"));
@@ -48,7 +50,7 @@ public class YandexGeoService {
             Map<String, Object> geoObject = castToMap(firstFeature.get("GeoObject"));
             Map<String, Object> point = castToMap(geoObject.get("Point"));
 
-            String pos = (String) point.get("pos"); // формат: "долгота широта"
+            String pos = (String) point.get("pos");
             String[] coords = pos.split(" ");
             if (coords.length != 2) {
                 throw new GeoServiceException("Invalid coordinates format from Yandex API");
