@@ -2,10 +2,13 @@ package ru.ildar.geodistance.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.ildar.geodistance.exception.GeoServiceException;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +28,13 @@ public class YandexGeoService {
         try {
             Map<String, Object> responseMap = webClient.get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/geocode")
+//                            .path("/geocode")
                             .queryParam("apikey", apiKey)
                             .queryParam("format", "json")
                             .queryParam("geocode", address)
                             .build())
                     .retrieve()
-                    .bodyToMono(Map.class)
+                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                     .block();
 
             if (responseMap == null) {

@@ -25,11 +25,15 @@ public class GeoDistanceService {
      */
     public GeoResponse processAddresses(String address1, String address2) {
         try {
-            // Получаем координаты для первого адреса через Yandex
+            System.out.println("Yandex address: " + address1); // Логирование
+            System.out.println("Dadata address: " + address2);
+
             Coordinates yandexCoords = yandexGeoService.getCoordinates(address1);
+            System.out.println("Yandex coords: " + yandexCoords);
 
             // Получаем координаты для второго адреса через Dadata
             Coordinates dadataCoords = dadataGeoService.getCoordinates(address2);
+            System.out.println("Dadata coords: " + dadataCoords);
 
             // Рассчитываем расстояние
             double distance = distanceCalculator.calculateDistanceMeters(
