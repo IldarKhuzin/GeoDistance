@@ -3,6 +3,7 @@ server:
 
 spring:
 
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -11,6 +12,7 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+
   datasource:
     #для работы в локальной сети вместо //mysql подставьте //localhost
     url: jdbc:mysql://mysql:3306/distcalc_dev?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
@@ -20,12 +22,13 @@ spring:
   profiles:
     active: dev
 
-
 management:
   endpoints:
     web:
       exposure:
         include: health,info,prometheus
+
+
 
   endpoint:
     prometheus:
@@ -42,6 +45,7 @@ logging:
 
 app:
   yandex:
+
     api-key: a95f5d4d-151b-42d9-8519-7aef29a5a5c1
     url: https://geocode-maps.yandex.ru/1.x
   dadata:
@@ -49,6 +53,7 @@ app:
     token: 3ae49eb03d50473ad14419fe4dbd953a99dff432
     secret: 37b92b54af4c0ee3e4f02d8aefb088c97de02b57
     url: https://cleaner.dadata.ru/api/v1/clean/address
+
 
 webclient:
   connect-timeout-ms: 5000

@@ -1,9 +1,11 @@
 spring:
   datasource:
+
     #для работы в локальной сети вместо //mysql подставьте //localhost
     url: jdbc:mysql://mysql:3306/distcalc_dev?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
     username: admin
     password: admin
+
 
 logging:
   level:

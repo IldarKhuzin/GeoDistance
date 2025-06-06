@@ -1,4 +1,3 @@
-# Используем официальный образ OpenJDK
 FROM openjdk:17-jdk-slim
 
 # Создаем рабочую директорию
@@ -13,4 +12,5 @@ RUN apt-get update && apt-get install -y netcat && rm -rf /var/lib/apt/lists/*
 EXPOSE 8081
 
 # Запускаем приложение
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
