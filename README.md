@@ -71,8 +71,8 @@ POST /api/address
 
 📊 Мониторинг
 
-- Prometheus: http://localhost:9090
-- Grafana: http://localhost:3000
+- Prometheus: http://localhost:9091
+- Grafana: http://localhost:3001
     - Login: admin / admin
     - Dashboard с основными метриками по REST-запросам и ошибкам
 
