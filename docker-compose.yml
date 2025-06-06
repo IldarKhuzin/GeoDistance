@@ -7,8 +7,24 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
-    env_file:
-      - .env
+    #    command: sh -c "env && java -jar app.jar"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DB: distcalc_dev
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+
+      YANDEX_API_KEY: a95f5d4d-151b-42d9-8519-7aef29a5a5c1
+      DADATA_API_KEY: 3ae49eb03d50473ad14419fe4dbd953a99dff432
+      DADATA_TOKEN: 3ae49eb03d50473ad14419fe4dbd953a99dff432
+      DADATA_SECRET: 37b92b54af4c0ee3e4f02d8aefb088c97de02b57
+
+      WEBCLIENT_CONNECT_TIMEOUT: 5000
+      WEBCLIENT_READ_TIMEOUT: 10000
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -24,10 +40,11 @@ services:
   mysql:
     image: mysql:8
     environment:
-      MYSQL_DATABASE: ${MYSQL_DB}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+      MYSQL_DATABASE: distcalc_dev
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
     ports:
       - "3307:3306"
     volumes:
@@ -35,7 +52,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u admin -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u admin -padmin || exit 1"]
       interval: 5s
       timeout: 10s
       retries: 20

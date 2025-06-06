@@ -7,6 +7,8 @@ WORKDIR /app
 # Копируем JAR файл в контейнер
 COPY target/*.jar app.jar
 
+RUN apt-get update && apt-get install -y netcat && rm -rf /var/lib/apt/lists/*
+
 # Указываем порт, который будет использоваться приложением
 EXPOSE 8081
 
