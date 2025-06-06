@@ -2,16 +2,7 @@ server:
   port: 8081
 
 spring:
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE}
 
-  datasource:
-    url: jdbc:mysql://mysql:3306/${MYSQL_DB}?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true&autoReconnect=true
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
-    hikari:
-      connection-timeout: 60000
-      initialization-fail-timeout: 60000
 
   jpa:
     hibernate:
@@ -22,11 +13,23 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+  datasource:
+    #для работы в локальной сети вместо //mysql подставьте //localhost
+    url: jdbc:mysql://mysql:3306/distcalc_dev?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
+    username: admin
+    password: admin
+
+  profiles:
+    active: dev
+
 management:
   endpoints:
     web:
       exposure:
         include: health,info,prometheus
+
+
+
   endpoint:
     prometheus:
       enabled: true
@@ -42,12 +45,15 @@ logging:
 
 app:
   yandex:
-    api-key: ${YANDEX_API_KEY}
-    url: https://geocode-maps.yandex.ru/1.x/
+
+    api-key: a95f5d4d-151b-42d9-8519-7aef29a5a5c1
+    url: https://geocode-maps.yandex.ru/1.x
   dadata:
-    api-key: ${DADATA_API_KEY}
-    token: ${DADATA_TOKEN}
-    url: https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address
+    api-key: 3ae49eb03d50473ad14419fe4dbd953a99dff432
+    token: 3ae49eb03d50473ad14419fe4dbd953a99dff432
+    secret: 37b92b54af4c0ee3e4f02d8aefb088c97de02b57
+    url: https://cleaner.dadata.ru/api/v1/clean/address
+
 
 webclient:
   connect-timeout-ms: 5000

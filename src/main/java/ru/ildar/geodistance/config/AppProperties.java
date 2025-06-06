@@ -24,7 +24,7 @@ public class AppProperties {
     @Getter
     @Setter
     public static class Dadata {
-        private String token;
+        private String apiKey;
         private String url;
     }
 }

@@ -40,7 +40,7 @@ GeoDistance — это Spring Boot приложение для сравнени�
 
 2. Соберите проект:
    cd geodistance-service
-   ./mvnw clean package
+   ./mvn clean package
    cd ..
 
 3. Запустите всё через Docker Compose:
@@ -53,22 +53,26 @@ GeoDistance — это Spring Boot приложение для сравнени�
 POST /api/address
 
 {
-"address": "Москва, Красная площадь, 1"
+"dadataAddress": "Москва, Красная площадь, 1",
+"yandexAddress": "Москва, Костромская улица, 10"
 }
-
 Пример ответа:
 {
-"yandexCoordinates": { "lat": 55.7539, "lon": 37.6208 },
-"dadataCoordinates": { "lat": 55.7540, "lon": 37.6210 },
-"distanceMeters": 17.2
+"address1": "Москва, Костромская улица, 10",
+"yandexLatitude": 55.886418,
+"yandexLongitude": 37.595357,
+"address2": "Москва, Красная площадь, 1",
+"dadataLatitude": 55.7552921,
+"dadataLongitude": 37.6176294,
+"distanceMeters": 14646.764101108767,
+"message": "Успешно"
 }
-
 ------------------------------------------------------------
 
 📊 Мониторинг
 
-- Prometheus: http://localhost:9090
-- Grafana: http://localhost:3000
+- Prometheus: http://localhost:9091
+- Grafana: http://localhost:3001
     - Login: admin / admin
     - Dashboard с основными метриками по REST-запросам и ошибкам
 

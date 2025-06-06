@@ -23,11 +23,19 @@ public class GeoDistanceService {
      * 3) Сохранить в БД
      * 4) Вернуть результат
      */
-    public GeoResponse processAddress(String address) {
+    public GeoResponse processAddresses(String address1, String address2) {
         try {
-            var yandexCoords = yandexGeoService.getCoordinates(address);
-            var dadataCoords = dadataGeoService.getCoordinates(address);
+            System.out.println("Yandex address: " + address1); // Логирование
+            System.out.println("Dadata address: " + address2);
 
+            Coordinates yandexCoords = yandexGeoService.getCoordinates(address1);
+            System.out.println("Yandex coords: " + yandexCoords);
+
+            // Получаем координаты для второго адреса через Dadata
+            Coordinates dadataCoords = dadataGeoService.getCoordinates(address2);
+            System.out.println("Dadata coords: " + dadataCoords);
+
+            // Рассчитываем расстояние
             double distance = distanceCalculator.calculateDistanceMeters(
                     yandexCoords.getLatitude(),
                     yandexCoords.getLongitude(),
@@ -35,28 +43,32 @@ public class GeoDistanceService {
                     dadataCoords.getLongitude()
             );
 
-            // Сохраняем в БД
-            AddressEntity entity = new AddressEntity();
-            entity.setAddress(address);
-            entity.setYandexLatitude(yandexCoords.getLatitude());
-            entity.setYandexLongitude(yandexCoords.getLongitude());
-            entity.setDadataLatitude(dadataCoords.getLatitude());
-            entity.setDadataLongitude(dadataCoords.getLongitude());
-            entity.setDistanceMeters(distance);
+            // Сохраняем в базу (если нужно)
+            AddressEntity entity = AddressEntity.builder()
+                    .address(address1 + " | " + address2)
+                    .yandexLatitude(yandexCoords.getLatitude())
+                    .yandexLongitude(yandexCoords.getLongitude())
+                    .dadataLatitude(dadataCoords.getLatitude())
+                    .dadataLongitude(dadataCoords.getLongitude())
+                    .distanceMeters(distance)
+                    .build();
 
             addressRepository.save(entity);
 
+            // Формируем ответ
             return new GeoResponse(
-                    address,
+                    address1,
                     yandexCoords.getLatitude(),
                     yandexCoords.getLongitude(),
+                    address2,
                     dadataCoords.getLatitude(),
                     dadataCoords.getLongitude(),
                     distance,
                     "Успешно"
             );
         } catch (Exception e) {
-            throw new GeoServiceException("Ошибка при обработке адреса: " + e.getMessage(), e);
+            return new GeoResponse("Ошибка при обработке адресов: " + e.getMessage());
         }
     }
+
 }

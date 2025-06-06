@@ -10,7 +10,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AddressRequest {
 
-    @NotBlank(message = "Адрес не должен быть пустым")
-    private String address;
+    @NotBlank(message = "Первый адрес не должен быть пустым")
+    private String address1;
+
+    @NotBlank(message = "Второй адрес не должен быть пустым")
+    private String address2;
 
 }

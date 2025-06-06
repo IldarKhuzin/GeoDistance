@@ -1,65 +1,88 @@
 package ru.ildar.geodistance.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.ildar.geodistance.dto.AddressRequest;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.ildar.geodistance.dto.GeoResponse;
+import ru.ildar.geodistance.dto.TwoAddressRequest;
+import ru.ildar.geodistance.exception.GeoServiceException;
 import ru.ildar.geodistance.service.GeoDistanceService;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(GeoDistanceController.class)
 public class GeoDistanceControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
     private GeoDistanceService geoDistanceService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @BeforeEach
+    public void setUp() {
+        geoDistanceService = Mockito.mock(GeoDistanceService.class);
+        GeoDistanceController controller = new GeoDistanceController(geoDistanceService);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+    }
 
     @Test
-    public void testProcessAddress_success() throws Exception {
-        AddressRequest request = new AddressRequest("Москва, Красная площадь");
+    public void testCalculateDistance_success() throws Exception {
+        TwoAddressRequest request = new TwoAddressRequest();
+        request.setYandexAddress("Москва, Красная площадь");
+        request.setDadataAddress("Санкт-Петербург, Невский проспект");
 
-        GeoResponse response = new GeoResponse();
-        response.setAddress("Москва, Красная площадь");
-        response.setYandexLatitude(55.753215);
-        response.setYandexLongitude(37.622504);
-        response.setDadataLatitude(55.753215);
-        response.setDadataLongitude(37.622504);
-        response.setDistanceMeters(0.0);
-        response.setMessage("Успешно");
+        GeoResponse response = new GeoResponse(
+                request.getYandexAddress(),
+                55.753215,
+                37.622504,
+                request.getDadataAddress(),
+                59.934280,
+                30.335099,
+                635000.0,
+                "Успешно"
+        );
 
-        Mockito.when(geoDistanceService.processAddress(Mockito.anyString()))
-                .thenReturn(response);
+        Mockito.when(geoDistanceService.processAddresses(anyString(), anyString())).thenReturn(response);
 
         mockMvc.perform(post("/api/distance")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())  // Добавлен вывод лога
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.address").value("Москва, Красная площадь"))
-                .andExpect(jsonPath("$.yandexLatitude").value(55.753215))
-                .andExpect(jsonPath("$.yandexLongitude").value(37.622504))
-                .andExpect(jsonPath("$.dadataLatitude").value(55.753215))
-                .andExpect(jsonPath("$.dadataLongitude").value(37.622504))
-                .andExpect(jsonPath("$.distanceMeters").value(0.0))
+                .andExpect(jsonPath("$.address1").value(request.getYandexAddress()))
+                .andExpect(jsonPath("$.address2").value(request.getDadataAddress()))
+                .andExpect(jsonPath("$.distanceMeters").value(635000.0))
                 .andExpect(jsonPath("$.message").value("Успешно"));
     }
 
     @Test
-    public void testProcessAddress_badRequest() throws Exception {
-        AddressRequest request = new AddressRequest("");
+    public void testCalculateDistance_serviceException() throws Exception {
+        TwoAddressRequest request = new TwoAddressRequest();
+        request.setYandexAddress("Некорректный адрес");
+        request.setDadataAddress("Адрес 2");
+
+        Mockito.when(geoDistanceService.processAddresses(anyString(), anyString()))
+                .thenThrow(new GeoServiceException("Ошибка сервиса"));
+
+        mockMvc.perform(post("/api/distance")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                // По твоему коду сервис не выбрасывает исключение, но в контроллере есть catch GeoServiceException.
+                // В твоём сервисе сейчас исключения не выбрасываются, а возвращается GeoResponse с сообщением об ошибке.
+                // Поэтому такой тест может не сработать, если не изменить сервис.
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message", containsString("Ошибка при обработке адресов: Ошибка сервиса")));
+    }
+
+    @Test
+    public void testCalculateDistance_validationFails() throws Exception {
+        // Передаем пустой объект - @Valid должен сработать и вернуть 400 Bad Request
+        TwoAddressRequest request = new TwoAddressRequest();
 
         mockMvc.perform(post("/api/distance")
                         .contentType(MediaType.APPLICATION_JSON)

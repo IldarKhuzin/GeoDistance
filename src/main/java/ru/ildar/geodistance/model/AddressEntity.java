@@ -18,7 +18,7 @@ public class AddressEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "address", nullable = false)
     private String address;
 
     @Column(name = "yandex_latitude", nullable = false)

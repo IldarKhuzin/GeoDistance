@@ -7,12 +7,28 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
-    env_file:
-      - .env
+
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_DB: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+      YANDEX_API_KEY: ${YANDEX_API_KEY}
+      DADATA_API_KEY: ${DADATA_API_KEY}
+      DADATA_TOKEN: ${DADATA_TOKEN}
+      DADATA_SECRET: ${DADATA_SECRET}
+
+      WEBCLIENT_CONNECT_TIMEOUT: ${WEBCLIENT_CONNECT_TIMEOUT}
+      WEBCLIENT_READ_TIMEOUT: ${WEBCLIENT_READ_TIMEOUT}
     depends_on:
       mysql:
         condition: service_healthy
-    entrypoint: ["sh", "-c", "until nc -z mysql 3306; do echo waiting for mysql; sleep 2; done; java -jar /app/app.jar"]
+    entrypoint: ["sh", "-c", "until nc -z ${MYSQL_HOST} ${MYSQL_PORT}; do echo waiting for mysql; sleep 2; done; java -jar /app/app.jar"]
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 10s
@@ -25,7 +41,9 @@ services:
     image: mysql:8
     environment:
       MYSQL_DATABASE: ${MYSQL_DB}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
@@ -35,7 +53,9 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u admin -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u ${MYSQL_USER} -p${MYSQL_PASSWORD} || exit 1"]
+
       interval: 5s
       timeout: 10s
       retries: 20
