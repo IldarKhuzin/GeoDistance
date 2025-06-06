@@ -1,4 +1,4 @@
-📍 DistCalc
+📍 GeoDistance
 
 GeoDistance — это Spring Boot приложение для сравнения координат,
 полученных от двух геокодеров (Yandex и Dadata), с вычислением расстояния между ними и сохранением
@@ -32,56 +32,6 @@ GeoDistance — это Spring Boot приложение для сравнени�
 
 ------------------------------------------------------------
 
-📦 Структура проекта
-
-GeoDistance-service/
-├── src/
-│   ├── main/
-│   │   ├── java/ru/ildar/geodistance/
-│   │   │   ├── config/
-│   │   │   │   ├── WebClientConfig.java
-│   │   │   │   └── AppProperties.java
-│   │   │   ├── controller/
-│   │   │   │   └── GeoDistanceController.java
-│   │   │   ├── dto/
-│   │   │   │   ├── AddressRequest.java
-│   │   │   │   ├── GeoResponse.java
-│   │   │   │   └── ApiErrorResponse.java
-│   │   │   ├── exception/
-│   │   │   │   ├── GlobalExceptionHandler.java
-│   │   │   │   ├── GeoServiceException.java
-│   │   │   │   └── ResourceNotFoundException.java
-│   │   │   ├── model/
-│   │   │   │   └── AddressEntity.java
-│   │   │   ├── repository/
-│   │   │   │   └── AddressRepository.java
-│   │   │   ├── service/
-│   │   │   │   ├── GeoDistanceService.java
-│   │   │   │   ├── YandexGeoService.java
-│   │   │   │   ├── DadataGeoService.java
-│   │   │   │   └── DistanceCalculator.java
-│   │   │   └── GeoDistanceApplication.java
-│   │   └── resources/
-│   │       ├── application.yml
-│   │       ├── application-dev.yml
-│   │       └── application-prod.yml
-│   └── test/
-│       └── java/ru/ildar/geodistance/
-├── docker/
-│   ├── prometheus/
-│   │   └── prometheus.yml
-│   ├── grafana/
-│   │   └── dashboards/
-│   │       ├── spring-boot.json
-│   │       └── jvm-metrics.json
-│   └── docker-compose.yml
-|── Dockerfile
-├── .gitignore
-├── pom.xml
-└── README.md
-
-------------------------------------------------------------
-
 ⚙️ Запуск проекта
 
 1. Клонируйте репозиторий:
@@ -90,7 +40,7 @@ GeoDistance-service/
 
 2. Соберите проект:
    cd geodistance-service
-   ./mvnw clean package
+   ./mvn clean package
    cd ..
 
 3. Запустите всё через Docker Compose:
@@ -103,16 +53,20 @@ GeoDistance-service/
 POST /api/address
 
 {
-"address": "Москва, Красная площадь, 1"
+"dadataAddress": "Москва, Красная площадь, 1",
+"yandexAddress": "Москва, Костромская улица, 10"
 }
-
 Пример ответа:
 {
-"yandexCoordinates": { "lat": 55.7539, "lon": 37.6208 },
-"dadataCoordinates": { "lat": 55.7540, "lon": 37.6210 },
-"distanceMeters": 17.2
+"address1": "Москва, Костромская улица, 10",
+"yandexLatitude": 55.886418,
+"yandexLongitude": 37.595357,
+"address2": "Москва, Красная площадь, 1",
+"dadataLatitude": 55.7552921,
+"dadataLongitude": 37.6176294,
+"distanceMeters": 14646.764101108767,
+"message": "Успешно"
 }
-
 ------------------------------------------------------------
 
 📊 Мониторинг
