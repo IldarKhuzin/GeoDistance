@@ -43,7 +43,6 @@
 2. Соберите проект:
 
    ```bash
-   cd geodistance-service
    ./mvn clean package
    cd ..
    ```
