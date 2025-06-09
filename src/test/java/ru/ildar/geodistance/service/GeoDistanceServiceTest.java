@@ -2,92 +2,87 @@ package ru.ildar.geodistance.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.mockito.*;
 import ru.ildar.geodistance.dto.GeoResponse;
-import ru.ildar.geodistance.exception.GeoServiceException;
 import ru.ildar.geodistance.model.AddressEntity;
 import ru.ildar.geodistance.repository.AddressRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-public class GeoDistanceServiceTest {
+class GeoDistanceServiceTest {
 
-    private GeoDistanceService geoDistanceService;
-
+    @Mock
     private YandexGeoService yandexGeoService;
+
+    @Mock
     private DadataGeoService dadataGeoService;
+
+    @Mock
     private DistanceCalculator distanceCalculator;
+
+    @Mock
     private AddressRepository addressRepository;
 
-    @BeforeEach
-    public void setUp() {
-        yandexGeoService = Mockito.mock(YandexGeoService.class);
-        dadataGeoService = Mockito.mock(DadataGeoService.class);
-        distanceCalculator = Mockito.mock(DistanceCalculator.class);
-        addressRepository = Mockito.mock(AddressRepository.class);
+    @InjectMocks
+    private GeoDistanceService geoDistanceService;
 
-        geoDistanceService = new GeoDistanceService(yandexGeoService, dadataGeoService, distanceCalculator, addressRepository);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testProcessAddresses_success() {
-        String address1 = "Москва, Красная площадь";
-        String address2 = "Санкт-Петербург, Невский проспект";
+    void testProcessAddress_success() {
+        String address = "Москва, Красная площадь, 1";
 
-        Coordinates yandexCoords = new Coordinates(55.753215, 37.622504);
-        Coordinates dadataCoords = new Coordinates(59.934280, 30.335099);
+        Coordinates yandexCoords = new Coordinates(55.7558, 37.6173);
+        Coordinates dadataCoords = new Coordinates(55.7557, 37.6175);
+        double distance = 20.0;
 
-        Mockito.when(yandexGeoService.getCoordinates(address1)).thenReturn(yandexCoords);
-        Mockito.when(dadataGeoService.getCoordinates(address2)).thenReturn(dadataCoords);
+        when(yandexGeoService.getCoordinates(address)).thenReturn(yandexCoords);
+        when(dadataGeoService.getCoordinates(address)).thenReturn(dadataCoords);
+        when(distanceCalculator.calculateDistanceMeters(
+                yandexCoords.getLatitude(),
+                yandexCoords.getLongitude(),
+                dadataCoords.getLatitude(),
+                dadataCoords.getLongitude())
+        ).thenReturn(distance);
 
-        Mockito.when(distanceCalculator.calculateDistanceMeters(
-                        yandexCoords.getLatitude(), yandexCoords.getLongitude(),
-                        dadataCoords.getLatitude(), dadataCoords.getLongitude()))
-                .thenReturn(635000.0);
+        // Сохраняем адрес — ничего не возвращает
+        doAnswer(invocation -> {
+            AddressEntity entity = invocation.getArgument(0);
+            assertEquals(address, entity.getAddress());
+            assertEquals(yandexCoords.getLatitude(), entity.getYandexLatitude());
+            assertEquals(yandexCoords.getLongitude(), entity.getYandexLongitude());
+            assertEquals(dadataCoords.getLatitude(), entity.getDadataLatitude());
+            assertEquals(dadataCoords.getLongitude(), entity.getDadataLongitude());
+            assertEquals(distance, entity.getDistanceMeters());
+            return null;
+        }).when(addressRepository).save(any(AddressEntity.class));
 
-        Mockito.when(addressRepository.save(Mockito.any(AddressEntity.class))).thenAnswer(i -> i.getArguments()[0]);
-
-        GeoResponse response = geoDistanceService.processAddresses(address1, address2);
+        GeoResponse response = geoDistanceService.processAddress(address);
 
         assertNotNull(response);
-        assertEquals(address1, response.getAddress1());
-        assertEquals(yandexCoords.getLatitude(), response.getYandexLatitude(), 0.00001);
-        assertEquals(yandexCoords.getLongitude(), response.getYandexLongitude(), 0.00001);
-        assertEquals(address2, response.getAddress2());
-        assertEquals(dadataCoords.getLatitude(), response.getDadataLatitude(), 0.00001);
-        assertEquals(dadataCoords.getLongitude(), response.getDadataLongitude(), 0.00001);
-        assertEquals(635000.0, response.getDistanceMeters(), 0.1);
+        assertEquals(address, response.getAddress1());
+        assertEquals(yandexCoords.getLatitude(), response.getYandexLatitude());
+        assertEquals(yandexCoords.getLongitude(), response.getYandexLongitude());
+        assertEquals(address, response.getAddress2());
+        assertEquals(dadataCoords.getLatitude(), response.getDadataLatitude());
+        assertEquals(dadataCoords.getLongitude(), response.getDadataLongitude());
+        assertEquals(distance, response.getDistanceMeters());
         assertEquals("Успешно", response.getMessage());
     }
 
     @Test
-    public void testProcessAddresses_yandexServiceFails() {
-        String address1 = "Некорректный адрес";
-        String address2 = "Корректный адрес";
+    void testProcessAddress_exception() {
+        String address = "Неизвестный адрес";
 
-        Mockito.when(yandexGeoService.getCoordinates(address1))
-                .thenThrow(new GeoServiceException("Ошибка Yandex сервиса"));
+        when(yandexGeoService.getCoordinates(address)).thenThrow(new RuntimeException("Ошибка Yandex"));
 
-        GeoResponse response = geoDistanceService.processAddresses(address1, address2);
+        GeoResponse response = geoDistanceService.processAddress(address);
 
         assertNotNull(response);
-        assertTrue(response.getMessage().contains("Ошибка Yandex сервиса"));
-    }
-
-    @Test
-    public void testProcessAddresses_dadataServiceFails() {
-        String address1 = "Корректный адрес 1";
-        String address2 = "Некорректный адрес 2";
-
-        Coordinates yandexCoords = new Coordinates(55.753215, 37.622504);
-        Mockito.when(yandexGeoService.getCoordinates(address1)).thenReturn(yandexCoords);
-
-        Mockito.when(dadataGeoService.getCoordinates(address2))
-                .thenThrow(new GeoServiceException("Ошибка Dadata сервиса"));
-
-        GeoResponse response = geoDistanceService.processAddresses(address1, address2);
-
-        assertNotNull(response);
-        assertTrue(response.getMessage().contains("Ошибка Dadata сервиса"));
+        assertTrue(response.getMessage().contains("Ошибка при обработке адреса"));
     }
 }

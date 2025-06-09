@@ -23,19 +23,16 @@ public class GeoDistanceService {
      * 3) Сохранить в БД
      * 4) Вернуть результат
      */
-    public GeoResponse processAddresses(String address1, String address2) {
+    public GeoResponse processAddress(String address) {
         try {
-            System.out.println("Yandex address: " + address1); // Логирование
-            System.out.println("Dadata address: " + address2);
+            System.out.println("Обрабатываем адрес: " + address);
 
-            Coordinates yandexCoords = yandexGeoService.getCoordinates(address1);
+            Coordinates yandexCoords = yandexGeoService.getCoordinates(address);
             System.out.println("Yandex coords: " + yandexCoords);
 
-            // Получаем координаты для второго адреса через Dadata
-            Coordinates dadataCoords = dadataGeoService.getCoordinates(address2);
+            Coordinates dadataCoords = dadataGeoService.getCoordinates(address);
             System.out.println("Dadata coords: " + dadataCoords);
 
-            // Рассчитываем расстояние
             double distance = distanceCalculator.calculateDistanceMeters(
                     yandexCoords.getLatitude(),
                     yandexCoords.getLongitude(),
@@ -43,9 +40,8 @@ public class GeoDistanceService {
                     dadataCoords.getLongitude()
             );
 
-            // Сохраняем в базу (если нужно)
             AddressEntity entity = AddressEntity.builder()
-                    .address(address1 + " | " + address2)
+                    .address(address)
                     .yandexLatitude(yandexCoords.getLatitude())
                     .yandexLongitude(yandexCoords.getLongitude())
                     .dadataLatitude(dadataCoords.getLatitude())
@@ -55,20 +51,20 @@ public class GeoDistanceService {
 
             addressRepository.save(entity);
 
-            // Формируем ответ
             return new GeoResponse(
-                    address1,
+                    address,
                     yandexCoords.getLatitude(),
                     yandexCoords.getLongitude(),
-                    address2,
+                    address,
                     dadataCoords.getLatitude(),
                     dadataCoords.getLongitude(),
                     distance,
                     "Успешно"
             );
         } catch (Exception e) {
-            return new GeoResponse("Ошибка при обработке адресов: " + e.getMessage());
+            return new GeoResponse("Ошибка при обработке адреса: " + e.getMessage());
         }
     }
+
 
 }
