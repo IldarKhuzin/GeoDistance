@@ -54,7 +54,6 @@
    docker-compose up --build
    ```
 
-
 ---
 
 ## 🔗 REST API
