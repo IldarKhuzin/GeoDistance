@@ -58,7 +58,7 @@
 
 ## 🔗 REST API
 
-**POST** `/api/address`
+**POST** `/api/distance`
 
 **Пример запроса:**
 
